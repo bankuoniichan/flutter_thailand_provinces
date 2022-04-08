@@ -4,7 +4,7 @@ import 'package:flutter_thailand_provinces/flutter_thailand_provinces.dart';
 class DistrictProvider {
   static const String TABLE_DISTRICT = "districts";
 
-  static Future<List<DistrictDao>> all({int amphureId = 0}) async {
+  static Future<List<DistrictDao>> all({int amphureId = 0, int? limit}) async {
     String? where;
     List<dynamic>? whereArgs;
     if (amphureId > 0) {
@@ -13,7 +13,7 @@ class DistrictProvider {
     }
 
     List<Map<String, dynamic>> mapResult = await ThailandProvincesDatabase.db!
-        .query(TABLE_DISTRICT, where: where, whereArgs: whereArgs);
+        .query(TABLE_DISTRICT, where: where, whereArgs: whereArgs, limit: limit);
 
     List<DistrictDao> listDistrict = mapDistrictList(mapResult);
 
@@ -30,11 +30,12 @@ class DistrictProvider {
   }
 
   static Future<List<DistrictDao>> searchInAmphure(
-      {int amphureId = 1, String keyword = ""}) async {
+      {int amphureId = 1, String keyword = "", int? limit}) async {
     List<Map<String, dynamic>> mapResult = await ThailandProvincesDatabase.db!
         .query(TABLE_DISTRICT,
             where: "(amphure_id = ?) AND ( name_th LIKE ? OR name_en LIKE ? )",
-            whereArgs: ["$amphureId", "%$keyword%", "%$keyword%"]);
+            whereArgs: ["$amphureId", "%$keyword%", "%$keyword%"],
+            limit: limit);
 
     List<DistrictDao> listDistrict = mapDistrictList(mapResult);
 

@@ -29,10 +29,13 @@ class AddressProvider {
       "       JOIN  ${AmphureProvider.TABLE_AMPHURES}  A ON A.province_id = P.id "
       "       JOIN  ${DistrictProvider.TABLE_DISTRICT} D ON D.amphure_id  = A.id ";
 
-  static Future<List<AddressDao>> all({int provinceId = 0}) async {
+  static Future<List<AddressDao>> all({int provinceId = 0, int? limit}) async {
     String sql = _BASE_SQL;
     if (provinceId > 0) {
       sql = sql + " WHERE  P.id = ? ";
+    }
+    if (limit != null) {
+      sql = sql + " LIMIT ${limit} ";
     }
     List<Map<String, dynamic>> mapResult =
         await ThailandProvincesDatabase.db!.rawQuery(sql, ["$provinceId"]);
@@ -41,7 +44,7 @@ class AddressProvider {
     return listAddress;
   }
 
-  static Future<List<AddressDao>> search({String keyword = ""}) async {
+  static Future<List<AddressDao>> search({String keyword = "", int? limit}) async {
     String sql = _BASE_SQL +
         " WHERE  "
             " P.name_en LIKE ? OR P.name_th LIKE ? OR "
@@ -49,6 +52,9 @@ class AddressProvider {
             " D.name_en LIKE ? OR D.name_th LIKE ? OR "
             " D.zip_code LIKE ? "
             " ";
+    if (limit != null) {
+      sql = sql + " LIMIT ${limit} ";
+    }
     List<Map<String, dynamic>> mapResult =
         await ThailandProvincesDatabase.db!.rawQuery(sql, [
       "%$keyword%",
@@ -65,7 +71,7 @@ class AddressProvider {
   }
 
   static Future<List<AddressDao>> searchInProvince(
-      {int provinceId = 1, String keyword = ""}) async {
+      {int provinceId = 1, String keyword = "", int? limit}) async {
     String sql = _BASE_SQL +
         " WHERE  "
             " P.id = ? AND ( "
@@ -74,6 +80,9 @@ class AddressProvider {
             " D.name_en LIKE ? OR D.name_th LIKE ? OR "
             " D.zip_code LIKE ? "
             " ) ";
+    if (limit != null) {
+      sql = sql + " LIMIT ${limit} ";
+    }
     List<Map<String, dynamic>> mapResult =
         await ThailandProvincesDatabase.db!.rawQuery(sql, [
       "$provinceId"
